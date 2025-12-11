@@ -19,11 +19,14 @@ export function AdapterSelector({ value, onChange }: AdapterSelectorProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchAdapters() {
+    async function fetchAdapters(): Promise<void> {
       try {
+        console.log("Fetching adapters...");
         const response = await fetch("http://localhost:8000/api/adapters");
+        console.log("Response:", response.status);
         if (response.ok) {
           const data = await response.json();
+          console.log("Adapters loaded:", data);
           setAdapters(data);
         }
       } catch (err) {

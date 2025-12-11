@@ -74,6 +74,10 @@ class AnalyzeResponse(BaseModel):
     vision_token_range: list[int | None]
     image_size: list[int]
     adapter_name: str | None
+    coordinates: list[int] | None = None
+    generated_tokens: list[str] = []
+    coordinate_token_indices: list[int] = []
+    vision_grid: list[int] | None = None
 
 
 class AdapterInfo(BaseModel):

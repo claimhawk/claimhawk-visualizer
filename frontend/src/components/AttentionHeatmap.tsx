@@ -2,32 +2,29 @@
 
 import { useEffect, useRef, useMemo } from "react";
 
-interface AttentionData {
+interface AttentionEntry {
   layer: number;
-  attention: number[][][]; // [heads, seq_len, seq_len]
-  shape: number[];
+  head: number;
+  attention: number[];
 }
 
 interface AttentionHeatmapProps {
   imageUrl: string;
-  attentionData: AttentionData[];
+  attentionData: AttentionEntry[];
   selectedLayer: number;
   selectedHead: number;
-  visionTokenRange: (number | null)[];
-  imageSize: number[]; // [width, height]
+  coordinates?: [number, number] | null;
+  visionGrid?: [number, number] | null;  // [height, width] from Qwen's image_grid_thw
+  imageSize?: [number, number] | null;   // [width, height] of original image
 }
 
 // Viridis-like colormap
 function getColor(value: number): string {
-  // Clamp value between 0 and 1
   const v = Math.max(0, Math.min(1, value));
-
-  // Simple viridis approximation
   const r = Math.round(255 * (0.267 + 0.329 * v + 2.566 * v * v - 2.762 * v * v * v));
   const g = Math.round(255 * (0.004 + 1.416 * v - 0.766 * v * v));
   const b = Math.round(255 * (0.329 + 1.442 * v - 1.631 * v * v + 0.859 * v * v * v));
-
-  return `rgba(${Math.min(255, r)}, ${Math.min(255, g)}, ${Math.min(255, b)}, 0.7)`;
+  return `rgba(${Math.min(255, Math.max(0, r))}, ${Math.min(255, Math.max(0, g))}, ${Math.min(255, Math.max(0, b))}, 0.6)`;
 }
 
 export function AttentionHeatmap({
@@ -35,46 +32,29 @@ export function AttentionHeatmap({
   attentionData,
   selectedLayer,
   selectedHead,
-  visionTokenRange,
+  coordinates,
+  visionGrid,
   imageSize,
 }: AttentionHeatmapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Extract attention for selected layer/head
+  // Find attention data for selected layer/head
   const attentionMap = useMemo(() => {
-    const layerData = attentionData.find((d) => d.layer === selectedLayer);
-    if (!layerData) return null;
-
-    // Get attention for selected head
-    // Shape: [num_heads, seq_len, seq_len]
-    const headAttn = layerData.attention[selectedHead];
-    if (!headAttn) return null;
-
-    // Extract vision-to-vision attention (image self-attention)
-    // visionTokenRange = [start, end]
-    const [vStart, vEnd] = visionTokenRange;
-    if (vStart === null || vEnd === null) return null;
-
-    // Get average attention from all tokens to vision tokens
-    // This shows what parts of the image are most attended to
-    const numVisionTokens = vEnd - vStart;
-    const visionAttention: number[] = new Array(numVisionTokens).fill(0);
-
-    // Sum attention to each vision token across all query positions
-    for (let q = 0; q < headAttn.length; q++) {
-      for (let v = vStart; v < vEnd; v++) {
-        visionAttention[v - vStart] += headAttn[q][v];
-      }
+    const entry = attentionData.find(
+      (d) => d.layer === selectedLayer && d.head === selectedHead
+    );
+    if (!entry || !entry.attention || entry.attention.length === 0) {
+      return null;
     }
 
-    // Normalize
-    const maxAttn = Math.max(...visionAttention);
-    const minAttn = Math.min(...visionAttention);
+    const values = entry.attention;
+    const maxAttn = Math.max(...values);
+    const minAttn = Math.min(...values);
     const range = maxAttn - minAttn || 1;
 
-    return visionAttention.map((v) => (v - minAttn) / range);
-  }, [attentionData, selectedLayer, selectedHead, visionTokenRange]);
+    return values.map((v) => (v - minAttn) / range);
+  }, [attentionData, selectedLayer, selectedHead]);
 
   // Draw heatmap overlay
   useEffect(() => {
@@ -88,29 +68,40 @@ export function AttentionHeatmap({
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      // Set canvas size to match container
       const containerWidth = container.clientWidth;
-      const scale = containerWidth / img.width;
-      const canvasHeight = img.height * scale;
+
+      // Use backend imageSize for aspect ratio if available (what model actually saw)
+      // Fall back to loaded image dimensions
+      const refWidth = imageSize ? imageSize[0] : img.width;
+      const refHeight = imageSize ? imageSize[1] : img.height;
+
+      // Canvas height based on reference aspect ratio
+      const canvasHeight = containerWidth * (refHeight / refWidth);
 
       canvas.width = containerWidth;
       canvas.height = canvasHeight;
 
-      // Draw original image
+      // Draw original image stretched to canvas (may distort if aspect ratios differ)
       ctx.drawImage(img, 0, 0, containerWidth, canvasHeight);
 
       // Calculate grid dimensions for attention map
-      // Qwen typically uses 14x14 or similar patch grid
-      // We need to figure out the spatial arrangement
+      // Use actual grid from Qwen's image_grid_thw if available
       const numTokens = attentionMap.length;
+      let gridHeight: number;
+      let gridWidth: number;
 
-      // Try to find a reasonable grid size
-      // Common sizes: 14x14=196, 16x16=256, etc.
-      let gridSize = Math.ceil(Math.sqrt(numTokens));
-
-      // Adjust if not square
-      const gridWidth = gridSize;
-      const gridHeight = Math.ceil(numTokens / gridWidth);
+      if (visionGrid && visionGrid[0] * visionGrid[1] === numTokens) {
+        // Use exact grid dimensions from model
+        gridHeight = visionGrid[0];
+        gridWidth = visionGrid[1];
+      } else {
+        // Fallback: try to infer square-ish grid
+        gridWidth = Math.ceil(Math.sqrt(numTokens));
+        gridHeight = Math.ceil(numTokens / gridWidth);
+        while (gridWidth * gridHeight < numTokens) {
+          gridHeight++;
+        }
+      }
 
       const cellWidth = containerWidth / gridWidth;
       const cellHeight = canvasHeight / gridHeight;
@@ -119,21 +110,75 @@ export function AttentionHeatmap({
       for (let i = 0; i < numTokens; i++) {
         const row = Math.floor(i / gridWidth);
         const col = i % gridWidth;
-
         const x = col * cellWidth;
         const y = row * cellHeight;
-
         ctx.fillStyle = getColor(attentionMap[i]);
         ctx.fillRect(x, y, cellWidth, cellHeight);
       }
 
+      // Draw click location crosshair if coordinates exist
+      if (coordinates) {
+        const [clickX, clickY] = coordinates;
+        // RU coordinates: 0-1000 maps to full dimension
+        const pixelX = (clickX / 1000) * canvas.width;
+        const pixelY = (clickY / 1000) * canvas.height;
+        console.log("canvas dims:", canvas.width, canvas.height, "coords:", clickX, clickY, "pixel:", pixelX, pixelY);
+
+        // Draw crosshair
+        ctx.strokeStyle = "#ff0000";
+        ctx.lineWidth = 2;
+
+        // Horizontal line
+        ctx.beginPath();
+        ctx.moveTo(pixelX - 20, pixelY);
+        ctx.lineTo(pixelX + 20, pixelY);
+        ctx.stroke();
+
+        // Vertical line
+        ctx.beginPath();
+        ctx.moveTo(pixelX, pixelY - 20);
+        ctx.lineTo(pixelX, pixelY + 20);
+        ctx.stroke();
+
+        // Circle around target
+        ctx.beginPath();
+        ctx.arc(pixelX, pixelY, 15, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        // White outline for visibility
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(pixelX, pixelY, 16, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        // Label with background for readability
+        const label = `[${clickX}, ${clickY}]`;
+        ctx.font = "bold 12px monospace";
+        const textWidth = ctx.measureText(label).width;
+
+        // Position label - try right side, fall back to left if too close to edge
+        let labelX = pixelX + 22;
+        if (labelX + textWidth + 4 > containerWidth) {
+          labelX = pixelX - textWidth - 26;
+        }
+
+        // Background
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillRect(labelX - 2, pixelY - 8, textWidth + 4, 16);
+
+        // Text
+        ctx.fillStyle = "#ff0000";
+        ctx.textAlign = "left";
+        ctx.fillText(label, labelX, pixelY + 4);
+      }
+
       // Add colorbar legend
       const legendWidth = 20;
-      const legendHeight = canvasHeight * 0.6;
+      const legendHeight = canvasHeight * 0.5;
       const legendX = containerWidth - legendWidth - 10;
       const legendY = (canvasHeight - legendHeight) / 2;
 
-      // Draw gradient
       const gradient = ctx.createLinearGradient(0, legendY + legendHeight, 0, legendY);
       for (let i = 0; i <= 10; i++) {
         gradient.addColorStop(i / 10, getColor(i / 10));
@@ -141,12 +186,10 @@ export function AttentionHeatmap({
       ctx.fillStyle = gradient;
       ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
 
-      // Draw border
       ctx.strokeStyle = "white";
       ctx.lineWidth = 1;
       ctx.strokeRect(legendX, legendY, legendWidth, legendHeight);
 
-      // Labels
       ctx.fillStyle = "white";
       ctx.font = "10px sans-serif";
       ctx.textAlign = "left";
@@ -155,12 +198,15 @@ export function AttentionHeatmap({
     };
 
     img.src = imageUrl;
-  }, [imageUrl, attentionMap]);
+  }, [imageUrl, attentionMap, coordinates, visionGrid, imageSize]);
 
   if (!attentionMap) {
     return (
       <div className="text-zinc-500 text-center py-8">
-        No attention data available for this layer/head
+        No attention data available for Layer {selectedLayer}
+        <div className="text-xs mt-2">
+          Available: {attentionData.length} entries
+        </div>
       </div>
     );
   }
@@ -169,7 +215,10 @@ export function AttentionHeatmap({
     <div ref={containerRef} className="relative">
       <canvas ref={canvasRef} className="w-full rounded-lg" />
       <div className="absolute bottom-2 left-2 bg-black/70 px-2 py-1 rounded text-xs">
-        Layer {selectedLayer}, Head {selectedHead}
+        Layer {selectedLayer}{coordinates ? ` • Coord attention` : ""}
+      </div>
+      <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-xs">
+        {attentionMap.length} vision tokens
       </div>
     </div>
   );

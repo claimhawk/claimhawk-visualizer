@@ -1,6 +1,13 @@
-"""Modal function for extracting attention weights from Qwen3-VL."""
+"""Modal function for extracting attention weights from Qwen3-VL during generation.
+
+v3 - Fixed coordinate parsing and aggregated attention.
+"""
+
+from __future__ import annotations
 
 import modal
+import re
+from typing import Optional
 
 app = modal.App("lora-attention-visualizer")
 
@@ -101,10 +108,27 @@ Rules:
 - If finishing, use action=terminate in the tool call."""
 
 
+def parse_coordinates(output_text: str) -> tuple[int, int] | None:
+    """Extract coordinates from model output like [213, 613]."""
+    # Try various formats the model might output
+    patterns = [
+        r'"coordinate"\s*:\s*\[(\d+),\s*(\d+)\]',  # "coordinate": [x, y]
+        r'\[(\d+),\s*(\d+)\]',  # Just [x, y] anywhere
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, output_text)
+        if match:
+            x, y = int(match.group(1)), int(match.group(2))
+            # Sanity check - coordinates should be in 0-1000 range
+            if 0 <= x <= 1000 and 0 <= y <= 1000:
+                return x, y
+    return None
+
+
 @app.function(
     image=image,
-    gpu="A100",
-    timeout=300,
+    gpu="H100",
+    timeout=600,
     volumes={
         "/volume": lora_volume,
         "/models": model_cache,
@@ -119,12 +143,13 @@ def extract_attention(
     selected_heads: list[int] | None = None,
 ) -> dict:
     """
-    Run inference with Qwen3-VL and optional LoRA adapter.
+    Run inference with Qwen3-VL and capture attention during generation.
 
-    Uses flash_attention_2 for speed. Attention visualization disabled for now.
+    Captures attention from coordinate tokens back to vision tokens to show
+    what the model looked at when deciding where to click.
     """
     import base64
-    import os
+    import json
     import torch
     from io import BytesIO
     from PIL import Image
@@ -137,30 +162,18 @@ def extract_attention(
     pil_image = Image.open(BytesIO(image_data)).convert("RGB")
     original_size = pil_image.size
 
-    # Use cached model path
-    # Model stored as "Qwen--Qwen3-VL-8B-Instruct" (/ replaced with --)
-    model_cache_path = "/models/models/Qwen--Qwen3-VL-8B-Instruct"
-
-    # Check if cached, otherwise use HF
-    if os.path.exists(model_cache_path):
-        print(f"Loading model from cache: {model_cache_path}")
-        model_path = model_cache_path
-    else:
-        print(f"Cache not found, using HF: {base_model}")
-        model_path = base_model
-
-    # Load processor and model
-    processor = AutoProcessor.from_pretrained(model_path)
+    # Load model with eager attention (required for output_attentions)
+    print(f"Loading model from HuggingFace: {base_model}")
+    processor = AutoProcessor.from_pretrained(base_model)
     model = Qwen3VLForConditionalGeneration.from_pretrained(
-        model_path,
+        base_model,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        attn_implementation="flash_attention_2",  # Fast!
+        attn_implementation="eager",
     )
 
     # Apply LoRA adapter if specified
     if adapter_name:
-        # Adapters at /volume/loras/{name}/adapter (from moe-inference volume)
         adapter_path = f"/volume/loras/{adapter_name}/adapter"
         print(f"Loading adapter from {adapter_path}")
         model = PeftModel.from_pretrained(
@@ -173,17 +186,14 @@ def extract_attention(
 
     # Prepare input
     messages = [
-        {
-            "role": "system",
-            "content": SYSTEM_PROMPT,
-        },
+        {"role": "system", "content": SYSTEM_PROMPT},
         {
             "role": "user",
             "content": [
                 {"type": "image", "image": pil_image},
                 {"type": "text", "text": query},
             ],
-        }
+        },
     ]
 
     text = processor.apply_chat_template(
@@ -200,21 +210,10 @@ def extract_attention(
     ).to(model.device)
 
     input_ids = inputs["input_ids"]
+    input_length = input_ids.shape[1]
     tokens = processor.tokenizer.convert_ids_to_tokens(input_ids[0])
 
-    # Run inference (no attention output with flash_attention_2)
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=256,
-            do_sample=False,
-        )
-
-    # Decode output
-    generated_ids = outputs[0][len(input_ids[0]):]
-    output_text = processor.decode(generated_ids, skip_special_tokens=True)
-
-    # Find vision token range
+    # Find vision token range in input
     vision_start = None
     vision_end = None
     for i, token in enumerate(tokens):
@@ -224,15 +223,145 @@ def extract_attention(
             vision_end = i
             break
 
+    print(f"Vision tokens: {vision_start} to {vision_end}")
+
+    # Generate with attention capture using a custom generation loop
+    # We need to capture attention at each generation step
+    generated_ids = input_ids.clone()
+    all_step_attentions = []  # Store attention from each generation step
+    generated_tokens = []
+
+    max_new_tokens = 256
+    eos_token_id = processor.tokenizer.eos_token_id
+
+    with torch.no_grad():
+        for step in range(max_new_tokens):
+            # Forward pass with attention
+            outputs = model(
+                input_ids=generated_ids,
+                pixel_values=inputs.get("pixel_values"),
+                image_grid_thw=inputs.get("image_grid_thw"),
+                output_attentions=True,
+                return_dict=True,
+            )
+
+            # Get next token
+            next_token_logits = outputs.logits[:, -1, :]
+            next_token = torch.argmax(next_token_logits, dim=-1, keepdim=True)
+
+            # Decode token for logging
+            token_str = processor.tokenizer.decode(next_token[0])
+            generated_tokens.append(token_str)
+
+            # Store attention from this token to vision tokens
+            # attentions is tuple of (num_layers,) tensors of shape (batch, heads, seq, seq)
+            if outputs.attentions and vision_start is not None and vision_end is not None:
+                # Get attention from the last token (just generated) to vision tokens
+                # We'll store attention from multiple layers
+                step_attention = {}
+                num_layers = len(outputs.attentions)
+
+                # Sample layers: early, middle, late
+                layers_to_capture = selected_layers or [0, num_layers // 4, num_layers // 2, 3 * num_layers // 4, num_layers - 1]
+
+                for layer_idx in layers_to_capture:
+                    if 0 <= layer_idx < num_layers:
+                        layer_attn = outputs.attentions[layer_idx][0]  # (heads, seq, seq)
+                        # Attention from last token to vision tokens, averaged across heads
+                        attn_to_vision = layer_attn[:, -1, vision_start:vision_end].mean(dim=0)
+                        step_attention[layer_idx] = attn_to_vision.float().cpu().numpy().tolist()
+
+                all_step_attentions.append({
+                    "step": step,
+                    "token": token_str,
+                    "attention": step_attention,
+                })
+
+            # Append to sequence
+            generated_ids = torch.cat([generated_ids, next_token], dim=-1)
+
+            # Check for EOS
+            if next_token.item() == eos_token_id:
+                break
+
+    # Decode full output
+    output_ids = generated_ids[0][input_length:]
+    output_text = processor.decode(output_ids, skip_special_tokens=True)
+
+    # Parse coordinates from output
+    coordinates = parse_coordinates(output_text)
+    print(f"Output: {output_text}")
+    print(f"Parsed coordinates: {coordinates}")
+
+    # Find coordinate tokens and aggregate their attention
+    # Look for tokens that are part of coordinate numbers
+    coord_token_indices = []
+
+    # Find tokens that look like they're part of coordinates (digits in the output)
+    for i, step_data in enumerate(all_step_attentions):
+        token = step_data["token"]
+        # Check if this token contains digits (likely part of coordinate)
+        if any(c.isdigit() for c in token):
+            coord_token_indices.append(i)
+
+    print(f"Found {len(coord_token_indices)} coordinate-related tokens")
+    print(f"Coordinate tokens: {[all_step_attentions[i]['token'] for i in coord_token_indices]}")
+
+    # Aggregate attention from coordinate tokens across ALL layers into single heatmap
+    import numpy as np
+    aggregated_attention = None
+
+    if coord_token_indices and all_step_attentions:
+        layers = list(all_step_attentions[0]["attention"].keys())
+        num_vision_tokens = len(all_step_attentions[0]["attention"][layers[0]]) if layers else 0
+
+        all_attentions = []
+        for step_idx in coord_token_indices:
+            for layer_idx in layers:
+                if layer_idx in all_step_attentions[step_idx]["attention"]:
+                    all_attentions.append(all_step_attentions[step_idx]["attention"][layer_idx])
+
+        if all_attentions:
+            # Average across all coordinate tokens AND all layers
+            aggregated_attention = np.mean(all_attentions, axis=0)
+            print(f"Aggregated attention: min={aggregated_attention.min():.6f}, max={aggregated_attention.max():.6f}, std={aggregated_attention.std():.6f}")
+
+    # Format attention data for frontend - single aggregated entry
+    attention_data = []
+    if aggregated_attention is not None:
+        attention_data.append({
+            "layer": 0,  # Dummy layer index
+            "head": -1,  # Averaged
+            "attention": aggregated_attention.tolist(),
+        })
+
+    # Get model info
+    num_layers = len(outputs.attentions) if outputs.attentions else 0
+    num_heads = outputs.attentions[0].shape[1] if outputs.attentions else 0
+
+    # Get vision grid dimensions from image_grid_thw
+    # Shape is (batch, 3) where 3 = (temporal, height, width) for each image
+    image_grid_thw = inputs.get("image_grid_thw")
+    vision_grid = None
+    if image_grid_thw is not None:
+        # For single image: [1, H, W] where H and W are grid dimensions
+        thw = image_grid_thw[0].tolist()  # [t, h, w]
+        vision_grid = [int(thw[1]), int(thw[2])]  # [height, width]
+        print(f"Vision grid from image_grid_thw: {vision_grid} (h x w)")
+
     return {
         "output_text": output_text,
-        "attention_data": [],  # Empty for now with flash_attention_2
-        "num_layers": 0,
-        "num_heads": 0,
+        "attention_data": attention_data,
+        "num_layers": num_layers,
+        "num_heads": num_heads,
         "tokens": tokens,
         "vision_token_range": [vision_start, vision_end],
         "image_size": list(original_size),
         "adapter_name": adapter_name,
+        "coordinates": list(coordinates) if coordinates else None,
+        "generated_tokens": generated_tokens,
+        "coordinate_token_indices": coord_token_indices,
+        "vision_grid": vision_grid,
     }
 
 
@@ -271,4 +400,5 @@ def main():
     )
 
     print(f"Output: {result['output_text']}")
+    print(f"Coordinates: {result['coordinates']}")
     print(f"Adapter: {result['adapter_name']}")
