@@ -1,0 +1,82 @@
+
+> frontend@0.1.0 dev
+> next dev -p 9001
+
+   ▲ Next.js 16.0.8 (Turbopack)
+   - Local:         http://localhost:9001
+   - Network:       http://192.168.1.68:9001
+
+ ✓ Starting...
+ ✓ Ready in 413ms
+ GET / 200 in 1360ms (compile: 1283ms, render: 76ms)
+ ✓ Compiled in 13ms
+ ✓ Compiled in 16ms
+ ✓ Compiled in 9ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 11ms
+ GET / 200 in 83ms (compile: 36ms, render: 48ms)
+ ✓ Compiled in 10ms
+ ✓ Compiled in 10ms
+ ✓ Compiled in 9ms
+ ✓ Compiled in 8ms
+ GET / 200 in 69ms (compile: 39ms, render: 30ms)
+ ✓ Compiled in 9ms
+ ✓ Compiled in 11ms
+ ✓ Compiled in 14ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 10ms
+ GET / 200 in 74ms (compile: 37ms, render: 37ms)
+ ✓ Compiled in 14ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 13ms
+ ✓ Compiled in 10ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 9ms
+ ✓ Compiled in 15ms
+ ✓ Compiled in 10ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 10ms
+ ⨯ ReferenceError: numGroups is not defined
+    at Home (src/app/page.tsx:114:24)
+  112 |                 min={1}
+  113 |                 max={27}
+> 114 |                 value={numGroups}
+      |                        ^
+  115 |                 onChange={(e) => setNumGroups(Math.max(1, Math.min(27, parseInt(e.target.value) || 6)))}
+  116 |                 className="w-full rounded-md bg-zinc-800 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+  117 |               /> {
+  digest: '4011027464'
+}
+ GET / 500 in 92ms (compile: 42ms, render: 50ms)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 8ms
+ GET / 200 in 47ms (compile: 21ms, render: 27ms)
+ GET / 200 in 38ms (compile: 6ms, render: 32ms)
+ GET / 200 in 27ms (compile: 3ms, render: 24ms)
+ ✓ Compiled in 11ms
+ ✓ Compiled in 10ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 7ms
+ ✓ Compiled in 12ms
+ ✓ Compiled in 12ms
+ ✓ Compiled in 9ms
+ ✓ Compiled in 10ms
+ ✓ Compiled in 11ms
+ ✓ Compiled in 9ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 7ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 8ms
+ GET / 200 in 90ms (compile: 52ms, render: 38ms)
+ ✓ Compiled in 7ms
+ ✓ Compiled in 7ms
+ GET / 200 in 92ms (compile: 46ms, render: 46ms)
+ ✓ Compiled in 14ms
+ ✓ Compiled in 10ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 9ms
+ ✓ Compiled in 13ms
+[?25h

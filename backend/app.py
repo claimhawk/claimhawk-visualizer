@@ -16,16 +16,14 @@ app = FastAPI(title="LoRA Attention Visualizer API")
 # CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:9001", "http://127.0.0.1:9001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Modal function references
-extract_attention = modal.Function.from_name(
-    "lora-attention-visualizer", "extract_attention"
-)
+# Modal class reference
+AttentionServer = modal.Cls.from_name("lora-attention-visualizer", "AttentionServer")
 
 # Load adapters from config
 ADAPTERS_CONFIG = Path(__file__).parent.parent.parent.parent / "config" / "adapters.yaml"
@@ -99,7 +97,7 @@ async def get_adapters():
     return load_adapters_from_config()
 
 
-@app.post("/api/analyze", response_model=AnalyzeResponse)
+@app.post("/api/analyze")
 async def analyze(
     image: Annotated[UploadFile, File()],
     query: Annotated[str, Form()] = "What action should I take?",
@@ -113,29 +111,24 @@ async def analyze(
     Upload an image and get back attention heatmaps showing
     which parts of the image the model focuses on.
     """
-    # Read and encode image
-    image_bytes = await image.read()
-    image_b64 = base64.b64encode(image_bytes).decode()
+    try:
+        # Read and encode image
+        image_bytes = await image.read()
+        image_b64 = base64.b64encode(image_bytes).decode()
 
-    # Parse layer/head selections
-    layers = None
-    if selected_layers:
-        layers = [int(x) for x in selected_layers.split(",")]
+        # Call Modal class method
+        server = AttentionServer()
+        result = server.extract_attention.remote(
+            image_base64=image_b64,
+            query=query,
+            adapter_name=adapter_name if adapter_name else None,
+        )
 
-    heads = None
-    if selected_heads:
-        heads = [int(x) for x in selected_heads.split(",")]
-
-    # Call Modal function
-    result = extract_attention.remote(
-        image_base64=image_b64,
-        query=query,
-        adapter_name=adapter_name if adapter_name else None,
-        selected_layers=layers,
-        selected_heads=heads,
-    )
-
-    return AnalyzeResponse(**result)
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "output_text": "", "attention_data": [], "num_layers": 0, "num_heads": 0, "tokens": [], "vision_token_range": [None, None], "image_size": [0, 0], "adapter_name": None, "coordinates": None, "generated_tokens": [], "coordinate_token_indices": [], "vision_grid": None}
 
 
 @app.post("/api/compare")
@@ -159,13 +152,13 @@ async def compare_adapters(
     results = {}
 
     # Run analysis for each adapter (could parallelize with Modal)
+    server = AttentionServer()
     for adapter in adapters_to_compare:
         adapter_name = adapter if adapter else None
-        result = extract_attention.remote(
+        result = server.extract_attention.remote(
             image_base64=image_b64,
             query=query,
             adapter_name=adapter_name,
-            selected_layers=[0, 10, 20, -1],  # Sample layers for comparison
         )
         key = adapter if adapter else "base"
         results[key] = result
@@ -176,4 +169,4 @@ async def compare_adapters(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=9002)

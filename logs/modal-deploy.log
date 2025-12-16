@@ -1,0 +1,13 @@
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/michaeloneal/development/claimhawk/projects/visualizer/modal/attentio
+│   n.py
+├── 🔨 Created web function web => 
+│   https://claimhawk--lora-attention-visualizer-web.modal.run
+├── 🔨 Created function AttentionServer.*.
+├── 🔨 Created function extract_attention.
+└── 🔨 Created function list_adapters.
+✓ App deployed in 1.741s! 🎉
+
+View Deployment: 
+https://modal.com/apps/claimhawk/main/deployed/lora-attention-visualizer

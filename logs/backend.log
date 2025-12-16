@@ -1,0 +1,374 @@
+INFO:     Started server process [41133]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:9002 (Press CTRL+C to quit)
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/root/attention.py", line 241, in extract_attention
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/peft/peft_model.py", line 2048, in generate
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/generation/utils.py", line 2564, in generate
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/generation/utils.py", line 2784, in _sample
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/utils/generic.py", line 1072, in wrapper
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1344, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/utils/generic.py", line 1072, in wrapper
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1138, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1061, in get_image_features
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 739, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/modeling_layers.py", line 94, in __call__
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 267, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1616, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/root/attention.py", line 280, in hook
+ValueError: not enough values to unpack (expected 3, got 2)
+INFO:     127.0.0.1:52491 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52491 - "GET /api/adapters HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/root/attention.py", line 241, in extract_attention
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/peft/peft_model.py", line 2048, in generate
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/generation/utils.py", line 2564, in generate
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/generation/utils.py", line 2784, in _sample
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/utils/generic.py", line 1072, in wrapper
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1344, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/utils/generic.py", line 1072, in wrapper
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1138, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 1061, in get_image_features
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 739, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/modeling_layers.py", line 94, in __call__
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 267, in forward
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1616, in _call_impl
+  File "<ta-01KCD3FF1ADZPZTMF34RTM0038>:/root/attention.py", line 280, in hook
+ValueError: not enough values to unpack (expected 3, got 2)
+INFO:     127.0.0.1:52618 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52977 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53798 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54306 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56365 - "GET /api/adapters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56365 - "GET /api/adapters HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD4VT4K6FH8AC690B22ZZV9>:/root/attention.py", line 349, in extract_attention
+  File "<ta-01KCD4VT4K6FH8AC690B22ZZV9>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1729, in __getattr__
+AttributeError: 'Qwen3VLForConditionalGeneration' object has no attribute 'layers'
+INFO:     127.0.0.1:56997 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57827 - "GET /api/adapters HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD4VT4K6FH8AC690B22ZZV9>:/root/attention.py", line 349, in extract_attention
+  File "<ta-01KCD4VT4K6FH8AC690B22ZZV9>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1729, in __getattr__
+AttributeError: 'Qwen3VLForConditionalGeneration' object has no attribute 'layers'
+INFO:     127.0.0.1:57859 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD50ZB37HB44HBTV94PTNGS>:/root/attention.py", line 356, in extract_attention
+  File "<ta-01KCD50ZB37HB44HBTV94PTNGS>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1729, in __getattr__
+AttributeError: 'Qwen3VLModel' object has no attribute 'layers'
+INFO:     127.0.0.1:58333 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD50ZB37HB44HBTV94PTNGS>:/root/attention.py", line 356, in extract_attention
+  File "<ta-01KCD50ZB37HB44HBTV94PTNGS>:/usr/local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1729, in __getattr__
+AttributeError: 'Qwen3VLModel' object has no attribute 'layers'
+INFO:     127.0.0.1:58549 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD56EFY4XZJ6G4SFP0EZEDT>:/root/attention.py", line 404, in extract_attention
+TypeError: Got unsupported ScalarType BFloat16
+INFO:     127.0.0.1:58958 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59520 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD5R608D5BDVWB53Y85PMCW>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:62490 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD5R608D5BDVWB53Y85PMCW>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:62874 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD5WJEQFY8W5V4Z2A0QAKX5>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:63186 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD5WJEQFY8W5V4Z2A0QAKX5>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:63814 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD6A6Q89GZ3PAQHDB0YGJFA>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:65020 - "POST /api/analyze HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/app.py", line 121, in analyze
+    result = server.extract_attention.remote(
+        image_base64=image_b64,
+        query=query,
+        adapter_name=adapter_name if adapter_name else None,
+    )
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_object.py", line 339, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1765, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 1709, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_functions.py", line 291, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/michaeloneal/development/claimhawk/projects/visualizer/backend/.venv/lib/python3.13/site-packages/modal/_utils/function_utils.py", line 530, in _process_result
+    raise exc_with_hints(exc)
+  File "<ta-01KCD6FWZ4R3BZTPQNZ3HNY532>:/root/attention.py", line 403, in extract_attention
+TypeError: object of type 'numpy.float32' has no len()
+INFO:     127.0.0.1:49627 - "POST /api/analyze HTTP/1.1" 200 OK
